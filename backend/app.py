@@ -7,6 +7,10 @@ app = Flask(__name__)
 UPLOAD_FOLDER = "static/output"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
+@app.route("/")
+def home():
+    return "AI Video Compressor API is running. Use the frontend to upload a video."
+
 @app.route("/compress", methods=["POST"])
 def compress():
     clean_old_files(UPLOAD_FOLDER)
@@ -25,6 +29,7 @@ def compress():
         filename = os.path.basename(output_path)
         return jsonify({"url": f"/download/{filename}"})
     except Exception as e:
+        print("Compression error:", e)
         return jsonify({"error": str(e)}), 500
 
 @app.route("/download/<filename>")
