@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>AI Video Compressor</title>
+</head>
+<body>
+  <h2>Upload MP4 to Compress (Max ~100MB)</h2>
+  <input type="file" id="videoInput" accept="video/mp4"><br><br>
+  <button onclick="upload()">Compress Video</button>
+
+  <p id="status"></p>
+  <a id="downloadLink" style="display: none;" target="_blank">Download Compressed Video</a>
+
+  <script>
+    async function upload() {
+      const file = document.getElementById("videoInput").files[0];
+      if (!file) return alert("Please select an MP4 file.");
+
+      const formData = new FormData();
+      formData.append("video", file);
+
+      document.getElementById("status").innerText = "Compressing, please wait...";
+
+      const res = await fetch("http://localhost:5000/compress", {
+        method: "POST",
+        body: formData
+      });
+
+      const data = await res.json();
+
+      if (data.url) {
+        const link = document.getElementById("downloadLink");
+        link.href = data.url;
+        link.style.display = "inline";
+        link.innerText = "Download Compressed Video";
+        document.getElementById("status").innerText = "Compression complete!";
+      } else {
+        document.getElementById("status").innerText = "Error: " + (data.error || "Unknown error");
+      }
+    }
+  </script>
+</body>
+</html>
